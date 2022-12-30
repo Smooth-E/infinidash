@@ -13,13 +13,16 @@ namespace Player
         
         private bool _grounded;
         private Rigidbody2D _rigidbody;
-        [SerializeField] private float _jumpVelocity;
+        [SerializeField] private float _jumpVelocity = 8.5f;
+
+        public Action Jumped;
         
         private void Jump()
         {
             var velocity = _rigidbody.velocity;
             velocity.y = _jumpVelocity;
             _rigidbody.velocity = velocity;
+            Jumped?.Invoke();
         }
         
         private void Awake()
