@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UI;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Player
 {
@@ -14,26 +15,31 @@ namespace Player
 
         private readonly Dictionary<string, float> _modifiers = new()
         {
-            { "Pink Orb", 1 },
-            { "Yellow Orb", 1.2f },
-            { "Green Orb", -1.2f },
-            { "Red Orb", 1.5f }
+            { "Pink Orb", 1.5f },
+            { "Yellow Orb", 1.2f * 1.5f },
+            { "Green Orb", 1.2f * 1.5f },
+            { "Red Orb", 1.5f * 1.5f },
+            { "Blue Orb", 0 }
         };
 
         private bool _grounded;
         private GameObject _orb;
         private string _orbTag = "None";
         private Rigidbody2D _rigidbody;
-        [SerializeField] private float _jumpVelocity = 8.5f;
+        private bool _buffering;
+        [SerializeField] private float _jumpForce = 8.5f;
 
         public Action Jumped;
         
         private void Jump()
         {
-            var modifier = _orbTag == "None" ? 1 : _modifiers[_orbTag];
+            var modifier = _orbTag == "None" ? 1 * 1.5f : _modifiers[_orbTag];
+            if (_orbTag is "Blue Orb" or "Green Orb") _rigidbody.gravityScale = -_rigidbody.gravityScale;
             var velocity = _rigidbody.velocity;
-            velocity.y = _jumpVelocity * modifier * Mathf.Sign(_rigidbody.gravityScale);
+            velocity.y = 0;
             _rigidbody.velocity = velocity;
+            var force = new Vector2(0, _jumpForce * modifier * Mathf.Sign(_rigidbody.gravityScale));
+            _rigidbody.AddForce(force, ForceMode2D.Impulse);
             Jumped?.Invoke();
         }
         
@@ -43,7 +49,9 @@ namespace Player
             TouchCatcher.PointerJustDown += _ =>
             {
                 if (_grounded || _orbTag != "None") Jump();
+                else _buffering = true;
             };
+            TouchCatcher.PointerUp += _ => _buffering = false;
         }
 
         private void OnCollisionEnter2D(Collision2D other)
@@ -64,17 +72,18 @@ namespace Player
         {
             Debug.Log($"Entered some trigger! {other.tag}");
             var otherTag = other.tag;
-            if (otherTag.Contains("Orb") && otherTag != "Blue Orb")
+            if (otherTag.Contains("Orb"))
             {
                 _orbTag = otherTag;
                 _orb = other.gameObject;
+                if (_buffering) Jump();
             }
         }
 
         private void OnTriggerExit2D(Collider2D other)
         {
             var otherTag = other.tag;
-            if (otherTag.Contains("Orb") && otherTag != "Blue Orb" && otherTag == _orbTag && _orb == other.gameObject)
+            if (otherTag == _orbTag && _orb == other.gameObject)
             {
                 _orbTag = "None";
                 _orb = null;
