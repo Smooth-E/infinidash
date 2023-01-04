@@ -33,21 +33,21 @@ namespace Generator
         };
 
         public delegate void OrbDelegate(OrbType orbType, Vector2 position);
-        public delegate void PadDelegate(PadType padType, Vector2 position, bool onBlocks);
-        public delegate void ColumnDelegate(Vector2Int[] positions, int gravityDirection, bool onBlocks);
+        public delegate void PadDelegate(PadType padType, Vector2 position, bool onBlocks, int gravityDirection);
+        public delegate void ColumnDelegate(Vector2Int[] positions, int gravityDirection);
+        public delegate void BlockDelegate(Vector2 position, int gravityDirection);
         
         public static event OrbDelegate OrbHere;
         public static event PadDelegate PadHere;
         public static event ColumnDelegate NewColumn;
+        public static event BlockDelegate BlockHere;
 
         private void Jump(OrbType orbType)
         {
             _rigidbody.velocity = new Vector2(_moveVelocity, 0);
             if (orbType is OrbType.Blue or OrbType.Green)
-            {
                 _gravityDirection = -_gravityDirection;
-                _rigidbody.gravityScale = _gravityScale * _gravityDirection;
-            }
+            _rigidbody.gravityScale = _gravityScale * _gravityDirection;
             var force = new Vector2(0, _jumpForce * _jumpModifiers[(int)orbType] * _gravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
@@ -56,10 +56,8 @@ namespace Generator
         {
             _rigidbody.velocity = new Vector2(_moveVelocity, 0);
             if (padType == PadType.Blue)
-            {
                 _gravityDirection = -_gravityDirection;
-                _rigidbody.gravityScale = _gravityScale * _gravityDirection;
-            }
+            _rigidbody.gravityScale = _gravityScale * _gravityDirection;
             var force = new Vector2(0, _jumpForce * _jumpModifiers[(int)padType] * _gravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
@@ -69,19 +67,37 @@ namespace Generator
             while (true)
             {
                 // There are a bunch of actions a plotter can make
-                // 1. Stay as is and continue gliding
+                // 1. Start gliding
                 // 2. Jump
                 // 3. Jump off of an orb (1 out of 4)
                 // 4. Jump off of a pad (1 of 4)
-                yield return new WaitUntil(() => Mathf.Abs(transform.position.y - Mathf.RoundToInt(transform.position.y)) <= 0.1);
                 var currentPosition = transform.position;
                 currentPosition.y = Mathf.RoundToInt(currentPosition.y);
                 transform.position = currentPosition;
-                var action = Random.Range(1, 5);
-                while (_previousAction is 4 or 3 && action is 4)
-                    action = Random.Range(1, 3);
-                _onBlocks = action == 1 || action == 4;
+                var allowedActions = new Collection<int>();
+                allowedActions.Add(1);
+                allowedActions.Add(3);
+                if (_previousAction == 1) allowedActions.Add(2);
+                else if (_previousAction != 3 && _previousAction != 4) allowedActions.Add(4);
+                var action = allowedActions[Random.Range(0, allowedActions.Count)];
+                if (_previousAction != action)
+                    yield return new WaitUntil(() => Mathf.Abs(transform.position.y - Mathf.RoundToInt(transform.position.y)) <= 0.1);
                 _previousAction = action;
+                _onBlocks = action == 1;
+                if (action == 4) BlockHere?.Invoke(transform.position, _gravityDirection);
+
+                // Debugging
+                var colors = new Color[]
+                {
+                    Color.black,
+                    Color.red,
+                    Color.green,
+                    Color.blue,
+                    Color.white
+                };
+                // Gizmos.color = colors[action];
+                Debug.DrawLine(transform.position - new Vector3(0, 1000, 0), transform.position + new Vector3(0, 1000, 0), colors[action]);
+
                 switch (action)
                 {
                     case 1:
@@ -99,12 +115,40 @@ namespace Generator
                         break;
                     case 4:
                         var padType = (PadType)Random.Range(0, 4);
-                        PadHere?.Invoke(padType, transform.position, _previousAction == 1);
+                        PadHere?.Invoke(padType, transform.position, _previousAction == 1, _gravityDirection);
                         Jump(padType);
                         break;
                 }
                 yield return new WaitForSeconds(_stateChangeInterval);
                 if (_stateChangeInterval >= .2f) _stateChangeInterval -= .001f;
+            }
+        }
+
+        private IEnumerator BlockingCoroutine()
+        {
+            while (true)
+            {
+                _touchedCells = new Collection<Vector2Int>();
+                while (_onBlocks)
+                {
+                    var position = transform.position;
+                    var currentX = Mathf.RoundToInt(position.x);
+                    var currentY = Mathf.RoundToInt(position.y);
+                    if (currentX != _lastFrameX)
+                    {
+                        if (_touchedCells.Count > 0) 
+                            NewColumn?.Invoke(_touchedCells.ToArray(), _gravityDirection);
+                        _touchedCells = new() { new Vector2Int(currentX, currentY) };
+                    }
+                    else if (currentY != _lastFrameY)
+                    {
+                        _touchedCells.Add(new Vector2Int(currentX, currentY));
+                    }
+                    _lastFrameX = currentX;
+                    _lastFrameY = currentY;
+                    yield return null;
+                }
+                yield return new WaitUntil(() => _onBlocks);
             }
         }
 
@@ -115,24 +159,7 @@ namespace Generator
             var position = transform.position;
             _touchedCells = new() { new Vector2Int((int)position.x, (int)position.y) };
             StartCoroutine(PlottingCoroutine());
-        }
-
-        private void Update()
-        {
-            var position = transform.position;
-            var currentX = Mathf.RoundToInt(position.x);
-            var currentY = Mathf.RoundToInt(position.y);
-            if (currentX != _lastFrameX)
-            {
-                NewColumn?.Invoke(_touchedCells.ToArray(), _gravityDirection, _onBlocks);
-                _touchedCells = new() { new Vector2Int(currentX, currentY) };
-            }
-            else if (currentY != _lastFrameY)
-            {
-                _touchedCells.Add(new Vector2Int(currentX, currentY));
-            }
-            _lastFrameX = currentX;
-            _lastFrameY = currentY;
+            StartCoroutine(BlockingCoroutine());
         }
         
     }
