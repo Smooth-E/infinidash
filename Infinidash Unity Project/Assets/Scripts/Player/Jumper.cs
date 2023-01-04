@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UI;
 using UnityEngine;
-using UnityEngine.Serialization;
+using Tools;
 
 namespace Player
 {
@@ -13,32 +13,23 @@ namespace Player
 
         private const string TagGround = "Ground";
 
-        private readonly Dictionary<string, float> _modifiers = new()
-        {
-            { "Pink Orb", 1.5f },
-            { "Yellow Orb", 1.2f * 1.5f },
-            { "Green Orb", 1.2f * 1.5f },
-            { "Red Orb", 1.5f * 1.5f },
-            { "Blue Orb", 0 }
-        };
-
         private bool _grounded;
         private GameObject _orb;
         private string _orbTag = "None";
         private Rigidbody2D _rigidbody;
         private bool _buffering;
-        [SerializeField] private float _jumpForce = 8.5f;
+        private GameObject _lastCollidedGroundPiece = null;
 
         public Action Jumped;
         
         private void Jump()
         {
-            var modifier = _orbTag == "None" ? 1 * 1.5f : _modifiers[_orbTag];
+            var modifier = _orbTag == "None" ? 1 * 1.5f : Constants.JumpModifiersDictionary[_orbTag];
             if (_orbTag is "Blue Orb" or "Green Orb") _rigidbody.gravityScale = -_rigidbody.gravityScale;
             var velocity = _rigidbody.velocity;
             velocity.y = 0;
             _rigidbody.velocity = velocity;
-            var force = new Vector2(0, _jumpForce * modifier * Mathf.Sign(_rigidbody.gravityScale));
+            var force = new Vector2(0, Constants.JumpForce * modifier * Mathf.Sign(_rigidbody.gravityScale));
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
             Jumped?.Invoke();
         }
@@ -59,18 +50,19 @@ namespace Player
             if (other.gameObject.CompareTag("Ground"))
             {
                 _grounded = true;
+                _lastCollidedGroundPiece = other.gameObject;
                 if (TouchCatcher.IsPointerDown) Jump();
             }
         }
 
         private void OnCollisionExit2D(Collision2D other)
         {
-            if (other.gameObject.CompareTag("Ground")) _grounded = false;
+            if (other.gameObject.CompareTag("Ground") && _lastCollidedGroundPiece == other.gameObject) 
+                _grounded = false;
         }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            Debug.Log($"Entered some trigger! {other.tag}");
             var otherTag = other.tag;
             if (otherTag.Contains("Orb"))
             {

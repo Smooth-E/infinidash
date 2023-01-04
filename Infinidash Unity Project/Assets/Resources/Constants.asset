@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd4712be58e08839180bced7a4b25b45, type: 3}
+  m_Name: Constants
+  m_EditorClassIdentifier: 
+  _gravityScale: 4
+  _jumpForce: 8.5
+  _moveVelocity: 7
+  _pinkOrbModifier: 1
+  _yellowOrbModifier: 1.8000001
+  _redOrbModifier: 2.25
+  _blueOrbModifier: 0
+  _greenOrbModifier: 2.25

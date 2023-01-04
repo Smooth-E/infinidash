@@ -1,8 +1,8 @@
-using System;
 using System.Collections;
 using Mono.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using Tools;
 
 namespace Generator
 {
@@ -18,47 +18,34 @@ namespace Generator
         private int _gravityDirection = 1;
         private bool _onBlocks;
         private int _previousAction = -1;
-        
-        private readonly float _gravityScale = 4;
-        private readonly float _jumpForce = 8.5f;
-        private readonly float _moveVelocity = 7f;
-
-        private readonly float[] _jumpModifiers = new[]
-        {
-            1,
-            1.2f * 1.5f,
-            1.5f * 1.5f,
-            0,
-            1.5f * 1.5f
-        };
 
         public delegate void OrbDelegate(OrbType orbType, Vector2 position);
         public delegate void PadDelegate(PadType padType, Vector2 position, bool onBlocks, int gravityDirection);
         public delegate void ColumnDelegate(Vector2Int[] positions, int gravityDirection);
-        public delegate void BlockDelegate(Vector2 position, int gravityDirection);
+        public delegate void BlockForPadDelegate(Vector2 position, int gravityDirection, bool wasSliding);
         
         public static event OrbDelegate OrbHere;
         public static event PadDelegate PadHere;
         public static event ColumnDelegate NewColumn;
-        public static event BlockDelegate BlockHere;
+        public static event BlockForPadDelegate BlockUnderPad;
 
         private void Jump(OrbType orbType)
         {
-            _rigidbody.velocity = new Vector2(_moveVelocity, 0);
+            _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
             if (orbType is OrbType.Blue or OrbType.Green)
                 _gravityDirection = -_gravityDirection;
-            _rigidbody.gravityScale = _gravityScale * _gravityDirection;
-            var force = new Vector2(0, _jumpForce * _jumpModifiers[(int)orbType] * _gravityDirection);
+            _rigidbody.gravityScale = Constants.GravityScale * _gravityDirection;
+            var force = new Vector2(0, Constants.JumpForce * Constants.JumpModifiers[(int)orbType] * _gravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
 
         private void Jump(PadType padType)
         {
-            _rigidbody.velocity = new Vector2(_moveVelocity, 0);
+            _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
             if (padType == PadType.Blue)
                 _gravityDirection = -_gravityDirection;
-            _rigidbody.gravityScale = _gravityScale * _gravityDirection;
-            var force = new Vector2(0, _jumpForce * _jumpModifiers[(int)padType] * _gravityDirection);
+            _rigidbody.gravityScale = Constants.GravityScale * _gravityDirection;
+            var force = new Vector2(0, Constants.JumpForce * Constants.JumpModifiers[(int)padType] * _gravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
         
@@ -71,42 +58,32 @@ namespace Generator
                 // 2. Jump
                 // 3. Jump off of an orb (1 out of 4)
                 // 4. Jump off of a pad (1 of 4)
-                var currentPosition = transform.position;
-                currentPosition.y = Mathf.RoundToInt(currentPosition.y);
-                transform.position = currentPosition;
                 var allowedActions = new Collection<int>();
                 allowedActions.Add(1);
-                allowedActions.Add(3);
-                if (_previousAction == 1) allowedActions.Add(2);
-                else if (_previousAction != 3 && _previousAction != 4) allowedActions.Add(4);
+                if (_previousAction != -1)
+                {
+                    if (_previousAction == 1) allowedActions.Add(2);
+                    else allowedActions.Add(3);
+                    if (_previousAction != 3 && _previousAction != 4) allowedActions.Add(4);
+                }
                 var action = allowedActions[Random.Range(0, allowedActions.Count)];
                 if (_previousAction != action)
                     yield return new WaitUntil(() => Mathf.Abs(transform.position.y - Mathf.RoundToInt(transform.position.y)) <= 0.1);
-                _previousAction = action;
+                var currentPosition = transform.position;
+                currentPosition.y = Mathf.RoundToInt(currentPosition.y);
+                transform.position = currentPosition;
                 _onBlocks = action == 1;
-                if (action == 4) BlockHere?.Invoke(transform.position, _gravityDirection);
-
-                // Debugging
-                var colors = new Color[]
-                {
-                    Color.black,
-                    Color.red,
-                    Color.green,
-                    Color.blue,
-                    Color.white
-                };
-                // Gizmos.color = colors[action];
-                Debug.DrawLine(transform.position - new Vector3(0, 1000, 0), transform.position + new Vector3(0, 1000, 0), colors[action]);
-
+                if (action == 4) BlockUnderPad?.Invoke(transform.position, _gravityDirection, _previousAction == 1);
+                _previousAction = action;
                 switch (action)
                 {
                     case 1:
                         _rigidbody.gravityScale = 0;
-                        _rigidbody.velocity = new Vector2(_moveVelocity, 0);
+                        _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
                         break;
                     case 2:
-                        _rigidbody.gravityScale = _gravityScale * _gravityDirection;
-                        _rigidbody.AddForce(new Vector2(0, _jumpForce * _gravityDirection), ForceMode2D.Impulse);
+                        _rigidbody.gravityScale = Constants.GravityScale * _gravityDirection;
+                        _rigidbody.AddForce(new Vector2(0, Constants.JumpForce * _gravityDirection), ForceMode2D.Impulse);
                         break;
                     case 3:
                         var orbType = (OrbType)Random.Range(0, 5);
@@ -120,7 +97,7 @@ namespace Generator
                         break;
                 }
                 yield return new WaitForSeconds(_stateChangeInterval);
-                if (_stateChangeInterval >= .2f) _stateChangeInterval -= .001f;
+                if (_stateChangeInterval >= .4f) _stateChangeInterval -= .0001f;
             }
         }
 

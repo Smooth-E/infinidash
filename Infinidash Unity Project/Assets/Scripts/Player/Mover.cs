@@ -1,4 +1,5 @@
 using UnityEngine;
+using Tools;
 
 namespace Player
 {
@@ -8,11 +9,10 @@ namespace Player
     {
 
         private Rigidbody2D _rigidbody;
-        [SerializeField] private float _defaultVelocity = 5;
 
         private void Awake() => _rigidbody = GetComponent<Rigidbody2D>();
 
-        private void Update() => _rigidbody.velocity = new Vector2(_defaultVelocity, _rigidbody.velocity.y);
+        private void Update() => _rigidbody.velocity = new Vector2(Constants.MoveVelocity, _rigidbody.velocity.y);
 
         // TODO: Increase velocity when colliding with 'arrows'
 

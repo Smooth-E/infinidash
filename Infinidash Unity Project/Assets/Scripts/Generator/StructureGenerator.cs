@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using UnityEngine;
 
 namespace Generator
@@ -6,10 +7,11 @@ namespace Generator
     {
         
         [SerializeField] private GameObject _blockPrefab;
+        [SerializeField] private GameObject _extendedBlockPrefab;
 
-        private void SpawnBlock(Vector2 position, int gravityDirection)
+        private void SpawnBlock(Vector2 position, int gravityDirection, GameObject prefab)
         {
-            var block = Instantiate(_blockPrefab);
+            var block = Instantiate(prefab);
             block.transform.position = new Vector2(position.x, position.y - gravityDirection);
             var scale = block.transform.localScale;
             block.transform.localScale = new Vector3(scale.x, scale.y * gravityDirection, scale.z);
@@ -30,10 +32,10 @@ namespace Generator
                     foreach (var givenPosition in positions)
                         if (givenPosition.y > position.y) position = givenPosition;
                 }
-                SpawnBlock(position, gravityDirection);
+                SpawnBlock(position, gravityDirection, _blockPrefab);
             };
-            PathMaker.BlockHere += (position, gravityDirection) =>
-                SpawnBlock(position, gravityDirection);
+            PathMaker.BlockUnderPad += (position, gravityDirection, wasSliding) =>
+                SpawnBlock(position, gravityDirection, wasSliding ? _extendedBlockPrefab : _blockPrefab);
         }
 
     }
