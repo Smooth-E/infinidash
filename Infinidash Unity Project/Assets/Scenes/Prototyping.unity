@@ -1876,17 +1876,9 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 139905122351008042, guid: b2f6a0634bf389f3098839eee9f74806, type: 3}
-      propertyPath: _defaultVelocity
-      value: 7
-      objectReference: {fileID: 0}
     - target: {fileID: 139905122351008080, guid: b2f6a0634bf389f3098839eee9f74806, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 139905122351008084, guid: b2f6a0634bf389f3098839eee9f74806, type: 3}
-      propertyPath: m_GravityScale
-      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 139905122351008086, guid: b2f6a0634bf389f3098839eee9f74806, type: 3}
       propertyPath: m_RootOrder
