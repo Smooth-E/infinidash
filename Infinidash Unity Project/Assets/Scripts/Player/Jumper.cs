@@ -32,6 +32,7 @@ namespace Player
             var force = new Vector2(0, Constants.JumpForce * modifier * Mathf.Sign(_rigidbody.gravityScale));
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
             Jumped?.Invoke();
+            if (_orb != null && _orbTag != "None") _orb.GetComponent<Orb>().Deactivate(); 
         }
         
         private void Awake()
