@@ -578,6 +578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 922fff0b5d1944729def2c1aa78b1c84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pathMaker: {fileID: 1966060940}
   _pinkPad: {fileID: 4257669489455900680, guid: 2497e97b714f628b9a5e2f00104905f8, type: 3}
   _yellowPad: {fileID: 7601271136822810754, guid: e8a561c933127edf3833d60df514e8a2, type: 3}
   _redPad: {fileID: 7216807281031624451, guid: 7d024b6a158fc7f8fb205fff2357b83b, type: 3}
@@ -930,6 +931,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 841f17188208e14ff8e5bd03285628de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pathMaker: {fileID: 1966060940}
   _pinkOrb: {fileID: 7048409104674680922, guid: fdc10f77acbb052249817c3ad6b23b1d, type: 3}
   _yellowOrb: {fileID: 3255518611154775391, guid: bc67e0c4945d303d5a3ac7bb4994730c, type: 3}
   _redOrb: {fileID: 3871851637583560167, guid: 807c81ac2b3bb950a808596ca0e127d5, type: 3}
@@ -1328,7 +1330,7 @@ GameObject:
   - component: {fileID: 1630618960}
   - component: {fileID: 1630618959}
   m_Layer: 0
-  m_Name: Structure Generator
+  m_Name: Block Generator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1346,6 +1348,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fca886e4d340e12efaab3afd0690465f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pathMaker: {fileID: 1966060940}
+  _columnMaker: {fileID: 1966060936}
   _blockPrefab: {fileID: 5508079531051557737, guid: 50cadbcaaf9e9cc0d96c947dafb28c63, type: 3}
   _extendedBlockPrefab: {fileID: 2833950019222836736, guid: 0d8b5cf55890942c78f0cda461f52231, type: 3}
 --- !u!4 &1630618960
@@ -1713,6 +1717,7 @@ GameObject:
   - component: {fileID: 1966060936}
   - component: {fileID: 1966060935}
   - component: {fileID: 1966060934}
+  - component: {fileID: 1966060940}
   m_Layer: 0
   m_Name: Plotter
   m_TagString: Untagged
@@ -1843,6 +1848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f0878099a313967d80c626d19acc308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _pathMaker: {fileID: 1966060940}
 --- !u!50 &1966060937
 Rigidbody2D:
   serializedVersion: 4
@@ -1931,6 +1937,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1966060940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966060933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 204e2ff3ac1d644b18adca1907632ba2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stateChangeInterval: 0.5
 --- !u!1 &2026706495
 GameObject:
   m_ObjectHideFlags: 0
@@ -1964,6 +1983,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 204e2ff3ac1d644b18adca1907632ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stateChangeInterval: 0.5
 --- !u!4 &2026706497
 Transform:
   m_ObjectHideFlags: 0

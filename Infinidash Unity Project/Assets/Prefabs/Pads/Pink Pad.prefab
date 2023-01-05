@@ -21,7 +21,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2588976808097584079, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}
       propertyPath: m_TagString
-      value: Pink Pad
+      value: Pad
       objectReference: {fileID: 0}
     - target: {fileID: 2588976809624623538, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}
       propertyPath: m_Name

@@ -15,7 +15,7 @@ namespace Player
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
-            _jumper.Jumped += () =>
+            _jumper.OnJump += () =>
             {
                 _rigidbody.angularVelocity = _direction * _AngularVelocity;
                 _direction = -_direction;

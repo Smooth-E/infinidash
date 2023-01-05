@@ -5,17 +5,19 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
-  - Pink Orb
-  - Yellow Orb
-  - Red Orb
-  - Blue Orb
-  - Green Orb
-  - Pink Pad
-  - Yellow Pad
-  - Red Pad
-  - Blue Pad
   - Reverse Gravity Portal
   - Normal Gravity Portal
+  - Orb
+  - Pad
+  - Red Orb
+  - Green Orb
+  - Blue Orb
+  - Yellow Orb
+  - Pink Orb
+  - Pink Pad
+  - Blue Pad
+  - Yellow Pad
+  - Red Pad
   layers:
   - Default
   - TransparentFX

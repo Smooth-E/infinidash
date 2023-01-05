@@ -15,7 +15,8 @@ namespace PlayModeSaver {
 		public delegate void OnRestorePlayModeChangesDelegate (GameObject[] restoredRootGameObjects);
 		public static event OnRestorePlayModeChangesDelegate OnRestorePlayModeChanges;
 
-		static SavePlayModeChangesChecker () {
+        [System.Obsolete]
+        static SavePlayModeChangesChecker () {
 			EditorApplication.playmodeStateChanged += OnChangePlayModeState;
 		}
 

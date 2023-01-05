@@ -15,7 +15,7 @@ MonoBehaviour:
   _gravityScale: 4
   _jumpForce: 8.5
   _moveVelocity: 7
-  _pinkOrbModifier: 1
+  _pinkOrbModifier: 1.5
   _yellowOrbModifier: 1.8000001
   _redOrbModifier: 2.25
   _blueOrbModifier: 0

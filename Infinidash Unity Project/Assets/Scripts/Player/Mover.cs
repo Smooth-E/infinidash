@@ -1,5 +1,5 @@
 using UnityEngine;
-using Tools;
+using Game;
 
 namespace Player
 {

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -3515798929570186802}
   m_Layer: 0
   m_Name: Base Orb
-  m_TagString: Untagged
+  m_TagString: Orb
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -114,3 +114,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a77ee793d27895bc187f1e8b0705f9d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _type: 0

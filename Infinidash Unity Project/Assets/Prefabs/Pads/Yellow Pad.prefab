@@ -21,7 +21,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2588976808097584079, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}
       propertyPath: m_TagString
-      value: Yellow Pad
+      value: Pad
       objectReference: {fileID: 0}
     - target: {fileID: 2588976809624623538, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}
       propertyPath: m_Name
@@ -70,6 +70,10 @@ PrefabInstance:
     - target: {fileID: 2588976809624623539, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5358845024063013221, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}
+      propertyPath: _type
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 91111a526c1bc5dbb9e57fae9b2fd930, type: 3}

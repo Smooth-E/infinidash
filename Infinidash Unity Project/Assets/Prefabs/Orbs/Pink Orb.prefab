@@ -25,7 +25,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4415009154262284247, guid: 1f859324b97ae6a70b0d28bf169be15a, type: 3}
       propertyPath: m_TagString
-      value: Pink Orb
+      value: Orb
       objectReference: {fileID: 0}
     - target: {fileID: 5266696241083020243, guid: 1f859324b97ae6a70b0d28bf169be15a, type: 3}
       propertyPath: m_RootOrder

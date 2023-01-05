@@ -1,4 +1,4 @@
-namespace Generator
+namespace Game
 {
     public enum OrbType
     {
