@@ -1,3 +1,15 @@
 fileFormatVersion: 2
 guid: 922fff0b5d1944729def2c1aa78b1c84
-timeCreated: 1672602650
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _pinkPad: {fileID: 4257669489455900680, guid: 2497e97b714f628b9a5e2f00104905f8, type: 3}
+  - _yellowPad: {fileID: 7601271136822810754, guid: e8a561c933127edf3833d60df514e8a2, type: 3}
+  - _redPad: {fileID: 7216807281031624451, guid: 7d024b6a158fc7f8fb205fff2357b83b, type: 3}
+  - _bluePad: {fileID: 4833264109577139904, guid: 4583ca08cddc6b5f8a55d8c80f4f3c94, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
