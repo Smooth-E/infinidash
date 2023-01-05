@@ -14,7 +14,7 @@ namespace Generator
         private void Awake()
         {
             var orbs = new[] { _pinkOrb, _yellowOrb, _redOrb, _blueOrb, _greenOrb };
-            PathMaker.OrbHere += (type, position) =>
+            LevelMaker.OrbHere += (type, position) =>
             {
                 var orb = Instantiate(orbs[(int)type]);
                 orb.transform.position = position;

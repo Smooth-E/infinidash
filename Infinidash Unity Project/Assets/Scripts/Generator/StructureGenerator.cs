@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using UnityEngine;
 
 namespace Generator
@@ -19,7 +18,7 @@ namespace Generator
 
         private void Awake() 
         {
-            PathMaker.NewColumn += (positions, gravityDirection) =>
+            LevelMaker.NewColumn += (positions, gravityDirection) =>
             {
                 var position = positions[0];
                 if (gravityDirection > 0)
@@ -34,7 +33,7 @@ namespace Generator
                 }
                 SpawnBlock(position, gravityDirection, _blockPrefab);
             };
-            PathMaker.BlockUnderPad += (position, gravityDirection, wasSliding) =>
+            LevelMaker.BlockUnderPad += (position, gravityDirection, wasSliding) =>
                 SpawnBlock(position, gravityDirection, wasSliding ? _extendedBlockPrefab : _blockPrefab);
         }
 

@@ -1,41 +1,35 @@
 using System.Collections;
 using Mono.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
 using Tools;
+using Random = System.Random;
 
 namespace Generator
 {
-    [RequireComponent(typeof(Rigidbody2D))]
     public class PathMaker : MonoBehaviour
     {
 
         private Rigidbody2D _rigidbody;
         private float _stateChangeInterval = .5f;
-        private int _lastFrameX;
-        private int _lastFrameY;
-        private Collection<Vector2Int> _touchedCells;
-        private int _gravityDirection = 1;
-        private bool _onBlocks;
         private int _previousAction = -1;
+        private Random _random;
 
-        public delegate void OrbDelegate(OrbType orbType, Vector2 position);
-        public delegate void PadDelegate(PadType padType, Vector2 position, bool onBlocks, int gravityDirection);
-        public delegate void ColumnDelegate(Vector2Int[] positions, int gravityDirection);
-        public delegate void BlockForPadDelegate(Vector2 position, int gravityDirection, bool wasSliding);
+        protected bool OnBlocks { private set; get; }
+        protected int GravityDirection { private set; get; } = 1;
         
-        public static event OrbDelegate OrbHere;
-        public static event PadDelegate PadHere;
-        public static event ColumnDelegate NewColumn;
-        public static event BlockForPadDelegate BlockUnderPad;
+        protected virtual void CreateOrb(OrbType orbType, Vector2 position) {  }
+
+        protected virtual void CreatePad(PadType padType, Vector2 position, bool onBlocks, int gravityDirection) {  }
+
+        protected virtual void CreateBlockUnderPad(Vector2 position, int gravityDirection, bool wasSliding) {  }
 
         private void Jump(OrbType orbType)
         {
             _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
             if (orbType is OrbType.Blue or OrbType.Green)
-                _gravityDirection = -_gravityDirection;
-            _rigidbody.gravityScale = Constants.GravityScale * _gravityDirection;
-            var force = new Vector2(0, Constants.JumpForce * Constants.JumpModifiers[(int)orbType] * _gravityDirection);
+                GravityDirection = -GravityDirection;
+            _rigidbody.gravityScale = Constants.GravityScale * GravityDirection;
+            var force = new Vector2(0, Constants.JumpForce * Constants.JumpModifiers[(int)orbType] * GravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
 
@@ -43,12 +37,12 @@ namespace Generator
         {
             _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
             if (padType == PadType.Blue)
-                _gravityDirection = -_gravityDirection;
-            _rigidbody.gravityScale = Constants.GravityScale * _gravityDirection;
-            var force = new Vector2(0, Constants.JumpForce * Constants.JumpModifiers[(int)padType] * _gravityDirection);
+                GravityDirection = -GravityDirection;
+            _rigidbody.gravityScale = Constants.GravityScale * GravityDirection;
+            var force = new Vector2(0, Constants.JumpForce * Constants.JumpModifiers[(int)padType] * GravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
-        
+
         private IEnumerator PlottingCoroutine()
         {
             while (true)
@@ -66,14 +60,14 @@ namespace Generator
                     else allowedActions.Add(3);
                     if (_previousAction != 3 && _previousAction != 4) allowedActions.Add(4);
                 }
-                var action = allowedActions[Random.Range(0, allowedActions.Count)];
+                var action = allowedActions[_random.Next(0, allowedActions.Count)];
                 if (_previousAction != action)
                     yield return new WaitUntil(() => Mathf.Abs(transform.position.y - Mathf.RoundToInt(transform.position.y)) <= 0.1);
                 var currentPosition = transform.position;
                 currentPosition.y = Mathf.RoundToInt(currentPosition.y);
                 transform.position = currentPosition;
-                _onBlocks = action == 1;
-                if (action == 4) BlockUnderPad?.Invoke(transform.position, _gravityDirection, _previousAction == 1);
+                OnBlocks = action == 1;
+                if (action == 4) CreateBlockUnderPad(transform.position, GravityDirection, _previousAction == 1);
                 _previousAction = action;
                 switch (action)
                 {
@@ -82,17 +76,17 @@ namespace Generator
                         _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
                         break;
                     case 2:
-                        _rigidbody.gravityScale = Constants.GravityScale * _gravityDirection;
-                        _rigidbody.AddForce(new Vector2(0, Constants.JumpForce * _gravityDirection), ForceMode2D.Impulse);
+                        _rigidbody.gravityScale = Constants.GravityScale * GravityDirection;
+                        _rigidbody.AddForce(new Vector2(0, Constants.JumpForce * GravityDirection), ForceMode2D.Impulse);
                         break;
                     case 3:
-                        var orbType = (OrbType)Random.Range(0, 5);
-                        OrbHere?.Invoke(orbType, transform.position);
+                        var orbType = (OrbType)_random.Next(0, 5);
+                        CreateOrb(orbType, transform.position);
                         Jump(orbType);
                         break;
                     case 4:
-                        var padType = (PadType)Random.Range(0, 4);
-                        PadHere?.Invoke(padType, transform.position, _previousAction == 1, _gravityDirection);
+                        var padType = (PadType)_random.Next(0, 4);
+                        CreatePad(padType, transform.position, _previousAction == 1, GravityDirection);
                         Jump(padType);
                         break;
                 }
@@ -101,43 +95,14 @@ namespace Generator
             }
         }
 
-        private IEnumerator BlockingCoroutine()
-        {
-            while (true)
-            {
-                _touchedCells = new Collection<Vector2Int>();
-                while (_onBlocks)
-                {
-                    var position = transform.position;
-                    var currentX = Mathf.RoundToInt(position.x);
-                    var currentY = Mathf.RoundToInt(position.y);
-                    if (currentX != _lastFrameX)
-                    {
-                        if (_touchedCells.Count > 0) 
-                            NewColumn?.Invoke(_touchedCells.ToArray(), _gravityDirection);
-                        _touchedCells = new() { new Vector2Int(currentX, currentY) };
-                    }
-                    else if (currentY != _lastFrameY)
-                    {
-                        _touchedCells.Add(new Vector2Int(currentX, currentY));
-                    }
-                    _lastFrameX = currentX;
-                    _lastFrameY = currentY;
-                    yield return null;
-                }
-                yield return new WaitUntil(() => _onBlocks);
-            }
-        }
-
         private void Awake()
         {
+            _random = new Random(SeedGiver.Seed);
             _rigidbody = GetComponent<Rigidbody2D>();
             _rigidbody.gravityScale = 0;
             var position = transform.position;
-            _touchedCells = new() { new Vector2Int((int)position.x, (int)position.y) };
             StartCoroutine(PlottingCoroutine());
-            StartCoroutine(BlockingCoroutine());
         }
-        
+
     }
 }
