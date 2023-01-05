@@ -1,12 +1,9 @@
 using System.Collections;
 using Mono.Collections.Generic;
 using UnityEngine;
-using Random = UnityEngine.Random;
-using Tools;
 
 namespace Generator
 {
-    [RequireComponent(typeof(Rigidbody2D))]
     public class LevelMaker : PathMaker
     {
 
@@ -60,7 +57,7 @@ namespace Generator
             }
         }
 
-        private void Start()
+        protected override void PostStart()
         {
             var position = transform.position;
             _touchedCells = new() { new Vector2Int((int)position.x, (int)position.y) };

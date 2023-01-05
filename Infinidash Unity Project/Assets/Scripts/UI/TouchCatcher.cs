@@ -21,7 +21,6 @@ namespace UI
         public void OnPointerDown(PointerEventData eventData)
         {
             if (!_wasDownLastFrame) PointerJustDown?.Invoke(eventData);
-            Debug.Log("Pointer down!");
             PointerDown?.Invoke(eventData);
             IsPointerDown = true;
             _wasDownLastFrame = true;
@@ -29,7 +28,6 @@ namespace UI
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            Debug.Log("Pointer up!");
             PointerUp?.Invoke(eventData);
             IsPointerDown = false;
         }

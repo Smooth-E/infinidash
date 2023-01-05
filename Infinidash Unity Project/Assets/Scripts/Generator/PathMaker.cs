@@ -6,6 +6,7 @@ using Random = System.Random;
 
 namespace Generator
 {
+    [RequireComponent(typeof(Rigidbody2D))]
     public class PathMaker : MonoBehaviour
     {
 
@@ -95,13 +96,15 @@ namespace Generator
             }
         }
 
-        private void Awake()
+        protected virtual void PostStart() {  }
+
+        private void Start()
         {
             _random = new Random(SeedGiver.Seed);
             _rigidbody = GetComponent<Rigidbody2D>();
             _rigidbody.gravityScale = 0;
-            var position = transform.position;
             StartCoroutine(PlottingCoroutine());
+            PostStart();
         }
 
     }

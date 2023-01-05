@@ -1,20 +1,18 @@
 using System;
+using UnityEngine;
 using Random = UnityEngine.Random;
 
 namespace Generator
 {
-    public static class SeedGiver
+    public class SeedGiver : MonoBehaviour
     {
-        
-        private static int _seed = 0;
 
-        public static int Seed
+        public static int Seed { private set; get; } = 0;
+
+        private void Awake()
         {
-            get
-            {
-                while (_seed == 0) _seed = Random.Range(Int32.MinValue, Int32.MaxValue);
-                return _seed;
-            }
+            Seed = 0;
+            while (Seed == 0) Seed = Random.Range(Int32.MinValue, Int32.MaxValue);
         }
 
     }
