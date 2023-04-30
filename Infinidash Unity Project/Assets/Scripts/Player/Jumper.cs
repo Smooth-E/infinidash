@@ -52,11 +52,13 @@ namespace Player
                 _buffering = true;
         }
 
+        private void StopBuffering(PointerEventData eventData) => _buffering = false;
+
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
             TouchCatcher.PointerJustDown += OnPointerJustDown;
-            TouchCatcher.PointerUp += _ => _buffering = false;
+            TouchCatcher.PointerUp += StopBuffering;
         }
 
         private void OnCollisionEnter2D(Collision2D other)
@@ -88,6 +90,12 @@ namespace Player
         {
             if (other.CompareTag(TagOrb) && other.GetComponent<Orb>() == _orb)
                 _orb = null;
+        }
+
+        private void OnDestroy()
+        {
+            TouchCatcher.PointerJustDown -= OnPointerJustDown;
+            TouchCatcher.PointerUp -= StopBuffering;
         }
         
     }

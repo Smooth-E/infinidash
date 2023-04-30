@@ -33,6 +33,8 @@ namespace Generator
             _pads = new[] { _pinkPad, _yellowPad, _redPad, _bluePad };
             _pathMaker.OnCreatePad += CreatePad;
         }
+
+        private void OnDestroy() => _pathMaker.OnCreatePad -= CreatePad;
         
     }
 }

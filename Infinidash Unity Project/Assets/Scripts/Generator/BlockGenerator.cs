@@ -24,23 +24,35 @@ namespace Generator
             if (gravityDirection > 0)
             {
                 foreach (var givenPosition in positions)
+                {
                     if (givenPosition.y < position.y)
                         position = givenPosition;
+                }
             }
             else
             {
                 foreach (var givenPosition in positions)
+                {
                     if (givenPosition.y > position.y)
                         position = givenPosition;
+                }
             }
             SpawnBlock(position, gravityDirection, _blockPrefab);
         }
 
+        private void CreateBlock(Vector2 position, int gravityDirection, bool extended) =>
+            SpawnBlock(position, gravityDirection, extended ? _extendedBlockPrefab : _blockPrefab);
+
         private void Awake() 
         {
             _columnMaker.OnCreateColumn += CreateNewColumn;
-            _pathMaker.OnCreateBlockUnderPad += (position, gravityDirection, wasSliding) =>
-                SpawnBlock(position, gravityDirection, wasSliding ? _extendedBlockPrefab : _blockPrefab);
+            _pathMaker.OnCreateBlock += CreateBlock;
+        }
+
+        private void OnDestroy()
+        {
+            _columnMaker.OnCreateColumn -= CreateNewColumn;
+            _pathMaker.OnCreateBlock -= CreateBlock;
         }
 
     }

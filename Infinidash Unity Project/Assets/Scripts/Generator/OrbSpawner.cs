@@ -26,6 +26,8 @@ namespace Generator
             _orbs = new[] { _pinkOrb, _yellowOrb, _redOrb, _blueOrb, _greenOrb };
             _pathMaker.OnCreateOrb += CreateOrb;
         }
+
+        private void OnDestroy() => _pathMaker.OnCreateOrb -= CreateOrb;
         
     }
 }

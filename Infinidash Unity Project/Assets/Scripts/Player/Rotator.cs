@@ -10,17 +10,21 @@ namespace Player
         private Rigidbody2D _rigidbody;
         private int _direction = -1;
         [SerializeField] private Jumper _jumper;
-        [SerializeField] private float _AngularVelocity = 120;
+        [SerializeField] private float _angularVelocity = 120;
+
+        private void OnJump()
+        {
+            _rigidbody.angularVelocity = _direction * _angularVelocity;
+            _direction = -_direction;
+        }
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody2D>();
-            _jumper.OnJump += () =>
-            {
-                _rigidbody.angularVelocity = _direction * _AngularVelocity;
-                _direction = -_direction;
-            };
+            _jumper.OnJump += OnJump;
         }
+
+        private void OnDestroy() => _jumper.OnJump -= OnJump;
         
     }
 }

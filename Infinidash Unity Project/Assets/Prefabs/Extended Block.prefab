@@ -210,7 +210,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3808781022156183290}
   - component: {fileID: 3808781022156183291}
-  - component: {fileID: 3808781022156183284}
+  - component: {fileID: 212173675656543481}
   m_Layer: 0
   m_Name: Parent
   m_TagString: Ground
@@ -244,7 +244,7 @@ BoxCollider2D:
   m_GameObject: {fileID: 3808781022156183285}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 67fced884530723d5b60abe82340fb62, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -259,9 +259,9 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.5, y: 1}
   m_EdgeRadius: 0
---- !u!50 &3808781022156183284
+--- !u!50 &212173675656543481
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -269,7 +269,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3808781022156183285}
-  m_BodyType: 1
+  m_BodyType: 2
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -280,5 +280,5 @@ Rigidbody2D:
   m_Material: {fileID: 6200000, guid: 67fced884530723d5b60abe82340fb62, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 0

@@ -29,17 +29,24 @@ namespace Generator
 
         public delegate void OrbDelegate(OrbType orbType, Vector2 position);
         public delegate void PadDelegate(PadType padType, Vector2 position, bool onBlocks, int gravityDirection);
-        public delegate void BlockUnderPadDelegate(Vector2 position, int gravityDirection, bool wasSliding);
+        public delegate void BlockCreationDelegate(Vector2 position, int gravityDirection, bool extended);
         
         public event OrbDelegate OnCreateOrb;
         public event PadDelegate OnCreatePad;
-        public event BlockUnderPadDelegate OnCreateBlockUnderPad;
+        public event BlockCreationDelegate OnCreateBlock;
 
-        private void PerformJump(int modifierIndex)
+        private void Start()
         {
-            _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
-            _rigidbody.gravityScale = Constants.GravityScale * GravityDirection;
-            var force = Constants.CalculateJumpForce(Constants.JumpModifiers[modifierIndex], GravityDirection);
+            _random = new Random(SeedGiver.Seed);
+            _rigidbody = GetComponent<Rigidbody2D>();
+            
+            StartCoroutine(PlottingCoroutine());
+        }
+
+        private void Jump()
+        {
+            var modifier = Constants.JumpModifiersDictionary[OrbType.Pink];
+            var force = Constants.CalculateJumpForce(modifier, GravityDirection);
             _rigidbody.AddForce(force, ForceMode2D.Impulse);
         }
 
@@ -57,11 +64,20 @@ namespace Generator
             PerformJump((int)padType);
         }
 
+        private void PerformJump(int modifierIndex)
+        {
+            _rigidbody.gravityScale = Constants.GravityScale * GravityDirection;
+            var force = Constants.CalculateJumpForce(Constants.JumpModifiers[modifierIndex], GravityDirection);
+            _rigidbody.AddForce(force, ForceMode2D.Impulse);
+        }
+
         private bool PositionCloseToInt() => 
             Mathf.Abs(transform.position.y - Mathf.RoundToInt(transform.position.y)) <= 0.1;
 
         private IEnumerator PlottingCoroutine()
         {
+            yield return null;
+
             while (true)
             {
                 var allowedActions = new Collection<PlotterAction>();
@@ -86,18 +102,22 @@ namespace Generator
 
                 OnBlocks = action == PlotterAction.Slide;
 
-                if (action == PlotterAction.Pad) 
-                    OnCreateBlockUnderPad?.Invoke(transform.position, GravityDirection, _previousAction == PlotterAction.Slide);
+                if (action is PlotterAction.Jump or PlotterAction.Pad) 
+                {
+                    var extendBlock = _previousAction == PlotterAction.Slide;
+                    OnCreateBlock?.Invoke(currentPosition, GravityDirection, extendBlock);
+                }
+                
+                _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
 
                 switch (action)
                 {
                     case PlotterAction.Slide:
                         _rigidbody.gravityScale = 0;
-                        _rigidbody.velocity = new Vector2(Constants.MoveVelocity, 0);
                         break;
                     case PlotterAction.Jump:
                         _rigidbody.gravityScale = Constants.GravityScale * GravityDirection;
-                        _rigidbody.AddForce(new Vector2(0, Constants.JumpForce * GravityDirection), ForceMode2D.Impulse);
+                        Jump();
                         break;
                     case PlotterAction.Orb:
                         var orbType = (OrbType)_random.Next(0, 5);
@@ -106,7 +126,8 @@ namespace Generator
                         break;
                     case PlotterAction.Pad:
                         var padType = (PadType)_random.Next(0, 4);
-                        OnCreatePad?.Invoke(padType, transform.position, _previousAction == PlotterAction.Slide, GravityDirection);
+                        var onBlocks = _previousAction == PlotterAction.Slide;
+                        OnCreatePad?.Invoke(padType, transform.position, onBlocks, GravityDirection);
                         Jump(padType);
                         break;
                 }
@@ -117,13 +138,6 @@ namespace Generator
 
                 if (_stateChangeInterval >= .4f) _stateChangeInterval -= .0001f;
             }
-        }
-
-        private void Start()
-        {
-            _random = new Random(SeedGiver.Seed);
-            _rigidbody = GetComponent<Rigidbody2D>();
-            StartCoroutine(PlottingCoroutine());
         }
 
     }
